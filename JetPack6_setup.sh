@@ -82,11 +82,7 @@ echo "==================================="
 cd ~
 sudo apt install libgstrtspserver-1.0-0 python3-pip -y
 pip3 install psutil tqdm openvino
-if [ ! -d "ultralytics" ]; then
-    git clone https://github.com/ultralytics/ultralytics
-fi
-cd ultralytics
-pip3 install ultralytics[export]
+pip3 install ultralytics
 pip3 install onnxscript onnxslim
 pip3 install onnx cmake py-cpuinfo
 cd ~
@@ -127,6 +123,8 @@ print("torchvision:", torchvision.__version__)
 print("cuda available:", torch.cuda.is_available())
 print("torch cuda build:", torch.version.cuda)
 EOF
+
+sudo apt install vlc -y
 
 echo "==================================="
 echo "10. DeepStream"
