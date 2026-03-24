@@ -52,8 +52,12 @@ echo "==================================="
 echo "5. chromium"
 echo "==================================="
 sudo apt update
-sudo apt install --reinstall snapd -y
+snap download snapd --revision=24724
+sudo snap ack snapd_24724.assert
+sudo snap install snapd_24724.snap
+sudo snap refresh --hold snapd
 sudo apt install chromium-browser -y
+rm snapd_24724.*
 
 echo "==================================="
 echo "6. jetson-gpio"
@@ -66,16 +70,17 @@ echo "==================================="
 mkdir -p ~/workspace && cd ~/workspace
 wget https://developer.nvidia.com/downloads/embedded/l4t/r36_release_v4.4/sources/public_sources.tbz2
 tar xjf public_sources.tbz2 && rm public_sources.tbz2
-cp Linux_for_Tegra/source/opencv_gst_sample_src.tbz2 ./
+cp Linux_for_Tegra/source/opencv_gst_samples_src.tbz2 ./
 sudo rm -r Linux_for_Tegra
-tar xjf opencv_gst_sample_src.tbz2
+tar xjf opencv_gst_samples_src.tbz2
+rm opencv_gst_samples_src.tbz2
 cd ~
 
 echo "==================================="
 echo "8. ultralytics"
 echo "==================================="
 cd ~
-sudo apt install libgstrtspserver-1.0-0 -y
+sudo apt install libgstrtspserver-1.0-0 python3-pip -y
 pip3 install psutil tqdm openvino
 if [ ! -d "ultralytics" ]; then
     git clone https://github.com/ultralytics/ultralytics
