@@ -6,9 +6,12 @@
 
 set -e # Exit immediately if a command exits with a non-zero status.
 
+echo ""
 echo "==================================="
 echo "1. JetPack 6.2.1 installation"
 echo "==================================="
+echo ""
+
 sudo apt update
 sudo apt install nvidia-jetpack -y
 if ! grep -q "export PATH=/usr/local/cuda/bin:\$PATH" "$HOME/.bashrc"; then
@@ -38,19 +41,26 @@ make
 ./deviceQuery
 cd ~
 
+echo ""
 echo "==================================="
 echo "3. samba"
 echo "==================================="
+echo ""
 sudo apt install samba -y
 
+echo ""
 echo "==================================="
 echo "4. ssh"
 echo "==================================="
 sudo apt install ssh -y
+echo ""
 
+echo ""
 echo "==================================="
 echo "5. chromium"
 echo "==================================="
+echo ""
+
 sudo apt update
 snap download snapd --revision=24724
 sudo snap ack snapd_24724.assert
@@ -59,14 +69,19 @@ sudo snap refresh --hold snapd
 sudo apt install chromium-browser -y
 rm snapd_24724.*
 
+echo ""
 echo "==================================="
 echo "6. jetson-gpio"
 echo "==================================="
 echo "Jetson GPIO is usually pre-installed. Skipping explicit installation."
+echo ""
 
+echo ""
 echo "==================================="
 echo "7. opencv sample code"
 echo "==================================="
+echo ""
+
 mkdir -p ~/workspace && cd ~/workspace
 wget https://developer.nvidia.com/downloads/embedded/l4t/r36_release_v4.4/sources/public_sources.tbz2
 tar xjf public_sources.tbz2 && rm public_sources.tbz2
@@ -76,9 +91,12 @@ tar xjf opencv_gst_samples_src.tbz2
 rm opencv_gst_samples_src.tbz2
 cd ~
 
+echo ""
 echo "==================================="
 echo "8. ultralytics"
 echo "==================================="
+echo ""
+
 cd ~
 sudo apt install libgstrtspserver-1.0-0 python3-pip -y
 pip3 install psutil tqdm openvino
@@ -87,6 +105,7 @@ pip3 install onnxscript onnxslim
 pip3 install onnx cmake py-cpuinfo
 cd ~
 
+echo ""
 echo "==================================="
 echo "9. Pytorch with CUDA & Torchvision"
 echo "==================================="
@@ -126,9 +145,12 @@ EOF
 
 sudo apt install vlc -y
 
+echo ""
 echo "==================================="
 echo "10. DeepStream"
 echo "==================================="
+echo ""
+
 DEEPSTREAM_PKG="deepstream-7.1"
 
 # 0. Update GLib to 2.76.6 (Required)
@@ -179,9 +201,12 @@ if [[ -n "$NV_TEGRA_INFO" ]]; then
     fi
 fi
 
+echo ""
 echo "==================================="
 echo "11. DeepStream-YOLO"
 echo "==================================="
+echo ""
+
 cd ~
 sudo apt update
 sudo apt install libgstrtspserver-1.0-0 -y
@@ -196,10 +221,25 @@ if [ ! -d "DeepStream-Yolo" ]; then
 fi
 cd ~
 
+echo ""
+echo "==================================="
+echo "12. UART"
+echo "==================================="
+echo ""
+
+cd ~
+git clone https://github.com/JetsonHacksNano/UARTDemo
+sudo apt-get install python3-serial -y
+pip3 install pyserial
+sudo apt install minicom -y
+
+
+echo ""
 echo "==================================="
 echo "All installations completed successfully!"
 echo "Rebooting in 3 seconds..."
 echo "==================================="
+
 
 sleep 3
 sudo reboot
