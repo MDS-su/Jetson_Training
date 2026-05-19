@@ -20,8 +20,8 @@ section() {
     echo ""
 }
 
-ok()   { echo -e "  ${GREEN}${BOLD}[  DONE ✓]${RESET}  $1"; }
-info() { echo -e "  ${YELLOW}${BOLD}[RUNNING ]${RESET}  $1"; }
+ok()   { echo -e "  ${GREEN}${BOLD}[ DONE ]${RESET}  $1"; }
+info() { echo -e "  ${YELLOW}${BOLD}[ RUN  ]${RESET}  $1"; }
 
 # 1. Ask for the sudo password upfront and keep the session alive during the script execution.
 sudo -v
@@ -147,10 +147,11 @@ echo "PyTorch Verification:"
 info "Verifying PyTorch installation..."
 python3 - <<'EOF'
 import torch, torchvision
-print("  torch       :", torch.__version__)
-print("  torchvision :", torchvision.__version__)
-print("  CUDA available :", torch.cuda.is_available())
-print("  CUDA build ver :", torch.version.cuda)
+fmt = "  {:<16}: {}"
+print(fmt.format("torch",          torch.__version__))
+print(fmt.format("torchvision",    torchvision.__version__))
+print(fmt.format("CUDA available", torch.cuda.is_available()))
+print(fmt.format("CUDA build ver", torch.version.cuda))
 EOF
 
 sudo apt install vlc -y
