@@ -4,6 +4,25 @@
 # JetPack 6 & Additional Packages Setup Script
 # ==========================================
 
+# --- Color / style helpers ---
+BOLD="\e[1m"
+GREEN="\e[32m"
+YELLOW="\e[33m"
+CYAN="\e[36m"
+RESET="\e[0m"
+LINE="━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+section() {
+    echo ""
+    echo -e "${CYAN}${BOLD}${LINE}${RESET}"
+    echo -e "${CYAN}${BOLD}  $1${RESET}"
+    echo -e "${CYAN}${BOLD}${LINE}${RESET}"
+    echo ""
+}
+
+ok()   { echo -e "  ${GREEN}${BOLD}[  DONE ✓]${RESET}  $1"; }
+info() { echo -e "  ${YELLOW}${BOLD}[RUNNING ]${RESET}  $1"; }
+
 # 1. Ask for the sudo password upfront and keep the session alive during the script execution.
 sudo -v
 while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
@@ -14,11 +33,8 @@ export DEBIAN_FRONTEND=noninteractive
 # 3. Prevent the script from exiting if an error occurs, moving on to the next step instead.
 set +e # Disable "set -e" to ignore errors and continue.
 
-echo ""
-echo "==================================="
-echo "1. JetPack 6.2.1 installation"
-echo "==================================="
-echo ""
+section "1. JetPack 6.2.1 installation"
+info "Installing JetPack..."
 
 sudo apt update
 sudo apt install nvidia-jetpack -y
@@ -32,11 +48,11 @@ fi
 # Apply to current shell immediately
 export PATH=/usr/local/cuda/bin:${PATH:-}
 export LD_LIBRARY_PATH=/usr/local/cuda/lib64:${LD_LIBRARY_PATH:-}
-nvcc -V 
+nvcc -V
+ok "JetPack installed"
 
-echo "==================================="
-echo "2. CUDA Utilities"
-echo "==================================="
+section "2. CUDA Utilities"
+info "Building CUDA Samples..."
 mkdir -p ~/workspace && cd ~/workspace
 sudo apt install cmake -y
 if [ ! -d "cuda-samples" ]; then
@@ -48,26 +64,20 @@ cmake ..
 make
 ./deviceQuery
 cd ~
+ok "CUDA Utilities done"
 
-echo ""
-echo "==================================="
-echo "3. samba"
-echo "==================================="
-echo ""
+section "3. Samba"
+info "Installing Samba..."
 sudo apt install samba -y
+ok "Samba installed"
 
-echo ""
-echo "==================================="
-echo "4. ssh"
-echo "==================================="
+section "4. SSH"
+info "Installing SSH..."
 sudo apt install ssh -y
-echo ""
+ok "SSH installed"
 
-echo ""
-echo "==================================="
-echo "5. chromium"
-echo "==================================="
-echo ""
+section "5. Chromium"
+info "Installing Chromium..."
 
 sudo apt update
 snap download snapd --revision=24724
@@ -76,19 +86,14 @@ sudo snap install snapd_24724.snap
 sudo snap refresh --hold snapd
 sudo apt install chromium-browser -y
 rm snapd_24724.*
+ok "Chromium installed"
 
-echo ""
-echo "==================================="
-echo "6. jetson-gpio"
-echo "==================================="
-echo "Jetson GPIO is usually pre-installed. Skipping explicit installation."
-echo ""
+section "6. Jetson GPIO"
+info "Jetson GPIO is pre-installed. Skipping."
+ok "Jetson GPIO verified"
 
-echo ""
-echo "==================================="
-echo "7. opencv sample code"
-echo "==================================="
-echo ""
+section "7. OpenCV Sample Code"
+info "Downloading OpenCV sample code..."
 
 mkdir -p ~/workspace && cd ~/workspace
 wget https://developer.nvidia.com/downloads/embedded/l4t/r36_release_v4.4/sources/public_sources.tbz2
@@ -98,13 +103,10 @@ sudo rm -r Linux_for_Tegra
 tar xjf opencv_gst_samples_src.tbz2
 rm opencv_gst_samples_src.tbz2
 cd ~
+ok "OpenCV sample code ready"
 
-echo ""
-echo "==================================="
-echo "8. ultralytics"
-echo "==================================="
-echo ""
-
+section "8. Ultralytics"
+info "Installing Ultralytics and dependencies..."
 cd ~
 sudo apt install libgstrtspserver-1.0-0 python3-pip -y
 pip3 install psutil tqdm openvino
@@ -112,11 +114,10 @@ pip3 install ultralytics
 pip3 install onnxscript onnxslim
 pip3 install onnx cmake py-cpuinfo
 cd ~
+ok "Ultralytics installed"
 
-echo ""
-echo "==================================="
-echo "9. Pytorch with CUDA & Torchvision"
-echo "==================================="
+section "9. PyTorch with CUDA & Torchvision"
+info "Installing PyTorch / Torchvision..."
 TORCH_WHEEL_URL="https://pypi.jetson-ai-lab.io/jp6/cu126/+f/37d/7e156cfb4a646/torch-2.10.0-cp310-cp310-linux_aarch64.whl#sha256=37d7e156cfb4a646c4d7347597727db1529d184108f703324dfff1842cec094e"
 VISION_WHEEL_URL="https://pypi.jetson-ai-lab.io/jp6/cu126/+f/1b6/357c5532db61e/torchvision-0.25.0-cp310-cp310-linux_aarch64.whl#sha256=1b6357c5532db61e9bfe7ad69f73ba73e8214010de021da703d360d2cc16c3d7"
 
@@ -143,21 +144,20 @@ sudo rm cudss-local-tegra-repo-ubuntu2204-0.6.0_0.6.0-1_arm64.deb
 
 # Verification
 echo "PyTorch Verification:"
+info "Verifying PyTorch installation..."
 python3 - <<'EOF'
 import torch, torchvision
-print("torch:", torch.__version__)
-print("torchvision:", torchvision.__version__)
-print("cuda available:", torch.cuda.is_available())
-print("torch cuda build:", torch.version.cuda)
+print("  torch       :", torch.__version__)
+print("  torchvision :", torchvision.__version__)
+print("  CUDA available :", torch.cuda.is_available())
+print("  CUDA build ver :", torch.version.cuda)
 EOF
 
 sudo apt install vlc -y
+ok "PyTorch / Torchvision installed"
 
-echo ""
-echo "==================================="
-echo "10. DeepStream"
-echo "==================================="
-echo ""
+section "10. DeepStream"
+info "Installing DeepStream..."
 
 DEEPSTREAM_PKG="deepstream-7.1"
 
@@ -208,45 +208,40 @@ if [[ -n "$NV_TEGRA_INFO" ]]; then
         fi
     fi
 fi
+ok "DeepStream installed"
 
-echo ""
-echo "==================================="
-echo "11. DeepStream-YOLO"
-echo "==================================="
-echo ""
-
+section "11. DeepStream-YOLO"
+info "Installing DeepStream-YOLO and ONNX Runtime..."
 cd ~
 sudo apt update
 sudo apt install libgstrtspserver-1.0-0 -y
 pip3 install psutil tqdm openvino
 pip3 install onnx cmake py-cpuinfo
-wget https://nvidia.box.com/shared/static/6l0u97rj80ifwkk8rqbzj1try89fk26z.whl -O onnxruntime_gpu-1.19.0-cp310-cp310-linux_aarch64.whl 
-pip3 install onnxruntime_gpu-1.19.0-cp310-cp310-linux_aarch64.whl 
+wget https://nvidia.box.com/shared/static/6l0u97rj80ifwkk8rqbzj1try89fk26z.whl -O onnxruntime_gpu-1.19.0-cp310-cp310-linux_aarch64.whl
+pip3 install onnxruntime_gpu-1.19.0-cp310-cp310-linux_aarch64.whl
 rm onnxruntime_gpu-1.19.0-cp310-cp310-linux_aarch64.whl
 
 if [ ! -d "DeepStream-Yolo" ]; then
     git clone https://github.com/marcoslucianops/DeepStream-Yolo.git
 fi
 cd ~
+ok "DeepStream-YOLO installed"
 
-echo ""
-echo "==================================="
-echo "12. UART"
-echo "==================================="
-echo ""
-
+section "12. UART"
+info "Installing UART packages..."
 cd ~
 git clone https://github.com/JetsonHacksNano/UARTDemo
 sudo apt-get install python3-serial -y
 pip3 install pyserial
 sudo apt install minicom -y
-
+ok "UART installed"
 
 echo ""
-echo "==================================="
-echo "All installations completed successfully!"
-echo "Rebooting in 3 seconds..."
-echo "==================================="
+echo -e "${GREEN}${BOLD}${LINE}${RESET}"
+echo -e "${GREEN}${BOLD}  All installations completed successfully!${RESET}"
+echo -e "${GREEN}${BOLD}  Rebooting in 3 seconds...${RESET}"
+echo -e "${GREEN}${BOLD}${LINE}${RESET}"
+echo ""
 
 
 sleep 3
