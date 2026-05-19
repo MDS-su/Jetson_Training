@@ -34,7 +34,7 @@ sudo apt install cmake -y
 if [ ! -d "cuda-samples" ]; then
     git clone https://github.com/NVIDIA/cuda-samples.git
 fi
-cd cuda-samples/Samples/1_Utilities/deviceQuery
+cd cuda-samples/cpp/1_Utilities/deviceQuery
 mkdir -p build && cd build
 cmake ..
 make
