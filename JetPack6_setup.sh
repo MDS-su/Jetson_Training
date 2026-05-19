@@ -4,7 +4,15 @@
 # JetPack 6 & Additional Packages Setup Script
 # ==========================================
 
-set -e # Exit immediately if a command exits with a non-zero status.
+# 1. Ask for the sudo password upfront and keep the session alive during the script execution.
+sudo -v
+while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
+
+# 2. Disable interactive prompts during package installations.
+export DEBIAN_FRONTEND=noninteractive
+
+# 3. Prevent the script from exiting if an error occurs, moving on to the next step instead.
+set +e # Disable "set -e" to ignore errors and continue.
 
 echo ""
 echo "==================================="
